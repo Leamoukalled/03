@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Charity Water Drop Game</title>
   <!-- Add Google Fonts for a cooler title -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Arial', sans-serif;
+      /* Use Montserrat for body, Orbitron for title */
+      font-family: 'Montserrat', Arial, sans-serif;
       background: linear-gradient(135deg, #0f2027, #2c5364 80%);
       display: flex;
       justify-content: center;
@@ -87,7 +88,7 @@
       justify-content: flex-start;
     }
     #title {
-      font-family: 'Orbitron', 'Arial', sans-serif;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
       background: linear-gradient(90deg, #ffe600 60%, #fffbe6 100%);
       color: #1e2a3a;
       padding: 18px 8px 14px 8px;
@@ -328,6 +329,16 @@
       box-shadow: 0 1px 6px #5c3317cc, 0 0 8px #ffe60033;
     }
 
+    /* Use Montserrat for all main game text for on-brand look */
+    #score, #timer,
+    #reset-button, #start-button, #restart-button,
+    #feedback, #end-screen, #game-screen,
+    #well-fill, #brick-wall, .brick,
+    #difficulty, label[for="difficulty"],
+    body, html, select, option, footer, div, p, a, h3 {
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
     @media (max-width: 600px) {
       #game-container {
         max-width: 98vw;
@@ -361,7 +372,24 @@
   </svg>
   <!-- Add charity: water logo to the top -->
   <div style="width:10%;display:flex;justify-content:center;align-items:center;margin-bottom:18px;margin-top:8px;z-index:2;position:relative;">
-    <img src="img/water-can-transparent.png" alt="charity: water logo" style="max-width:320px;width:90%;height:auto;"/>
+    <img src="img/water-can-transparent.png" alt="charity: water logo" title="charity: water – Clean Water Changes Everything" style="max-width:320px;width:90%;height:auto;"/>
+  </div>
+  <!-- Mission statement -->
+  <div style="text-align:center;max-width:440px;margin:0 auto 10px auto;font-size:1.08rem;color:#ffe600;text-shadow:0 0 8px #1e2a3a;font-weight:bold;">
+    Every drop counts. Help build a well and bring clean water to communities in need.
+  </div>
+  <!-- Motivational message -->
+  <div style="text-align:center;max-width:440px;margin:0 auto 18px auto;font-size:1rem;color:#fffbe6;text-shadow:0 0 6px #2193b0;">
+    Move the bucket and collect clean water. Avoid the polluted drops!
+  </div>
+  <!-- Difficulty selector -->
+  <div style="text-align:center;max-width:440px;margin:0 auto 18px auto;">
+    <label for="difficulty" style="color:#ffe600;font-weight:bold;margin-right:8px;">Difficulty:</label>
+    <select id="difficulty" style="font-size:1rem;padding:4px 10px;border-radius:6px;">
+      <option value="easy">Easy</option>
+      <option value="normal" selected>Normal</option>
+      <option value="hard">Hard</option>
+    </select>
   </div>
   <div id="game-container">
     <div id="title">Clean Water Collector</div>
@@ -381,15 +409,28 @@
 
     <div id="end-screen">
       <h3 id="end-message"></h3>
-      <p><a href="https://www.charitywater.org" target="_blank">Learn about charity: water</a></p>
+      <div id="end-fact" style="color:#ffe600;text-shadow:0 0 8px #1e2a3a;font-size:1.1rem;margin-bottom:10px;display:none;"></div>
+      <p><a href="https://www.charitywater.org" target="_blank" style="color:#ffe600;text-shadow:0 0 8px #ffe60088;font-weight:bold;text-decoration:underline;">Learn about charity: water</a></p>
+      <button id="restart-button" style="display:none;margin-top:18px;">Restart</button>
     </div>
     <!-- Sound effects -->
-    <audio id="sound-good" src="https://cdn.jsdelivr.net/gh/terkelg/short-sounds@master/sounds/coin.mp3" preload="auto"></audio>
-    <audio id="sound-bad" src="https://cdn.jsdelivr.net/gh/terkelg/short-sounds@master/sounds/error.mp3" preload="auto"></audio>
+    <audio id="sound-good" src="sounds/good.mp3" preload="auto"></audio>
+    <audio id="sound-bad" src="sounds/bad.mp3" preload="auto"></audio>
+    <audio id="sound-click" src="sounds/click.mp3" preload="auto"></audio>
+    <audio id="sound-win" src="sounds/win.mp3" preload="auto"></audio>
     <!-- Confetti canvas -->
     <canvas id="confetti-canvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:30;"></canvas>
   </div>
-
+  <!-- Learn More link below the game -->
+  <div style="text-align:center;margin:18px 0 0 0;">
+    <a href="https://www.charitywater.org/our-work" target="_blank" style="color:#00eaff;text-decoration:underline;font-weight:bold;font-size:1.08rem;">
+      See how your support brings clean water to life &rarr;
+    </a>
+  </div>
+  <!-- Subtle footer -->
+  <footer style="text-align:center;margin:32px 0 0 0;font-size:0.98rem;color:#fffbe6;opacity:0.7;">
+    Made with 💧 for a better world. <span style="color:#ffe600;">Support <a href="https://www.charitywater.org" target="_blank" style="color:#ffe600;text-decoration:underline;">charity: water</a></span>
+  </footer>
   <script>
     const startButton = document.getElementById('start-button');
     const restartButton = document.getElementById('restart-button');
@@ -402,29 +443,57 @@
     const endMessage = document.getElementById('end-message');
     const fillBar = document.getElementById('fill-bar');
     const resetButton = document.getElementById('reset-button');
+    const difficultySelect = document.getElementById('difficulty');
 
     const soundGood = document.getElementById('sound-good');
     const soundBad = document.getElementById('sound-bad');
+    const soundClick = document.getElementById('sound-click');
+    const soundWin = document.getElementById('sound-win');
+
+    // Difficulty settings
+    const difficultySettings = {
+      easy:   { winScore: 12, timer: 75, dropInterval: 950 },
+      normal: { winScore: 20, timer: 60, dropInterval: 700 },
+      hard:   { winScore: 30, timer: 40, dropInterval: 480 }
+    };
+
+    // Current settings
+    let winScore = difficultySettings.normal.winScore;
+    let timer = difficultySettings.normal.timer;
+    let dropIntervalTime = difficultySettings.normal.dropInterval;
 
     let score = 0;
-    let timer = 60;
-    let dropInterval;
     let gameTimer;
-    const winScore = 20;
     const messages = ["Great!", "Nice!", "Keep going!", "You're on fire!", "Almost there!"];
+    // Milestone messages: {score: message}
+    const milestoneMessages = [
+      { score: () => Math.floor(winScore / 2), message: "Halfway there!" },
+      { score: () => Math.floor(winScore * 0.75), message: "75% done! The well is almost ready!" },
+      { score: () => winScore - 1, message: "Just one more drop to go!" }
+    ];
+    let shownMilestones = {};
+
+    function applyDifficulty() {
+      const diff = difficultySelect.value;
+      winScore = difficultySettings[diff].winScore;
+      timer = difficultySettings[diff].timer;
+      dropIntervalTime = difficultySettings[diff].dropInterval;
+    }
 
     function startGame() {
+      applyDifficulty();
       startButton.style.display = 'none';
       endScreen.style.display = 'none';
       resetButton.style.display = 'block';
       gameScreen.innerHTML = '';
       score = 0;
-      timer = 60;
+      shownMilestones = {}; // Reset milestone tracking
+      // timer is set by applyDifficulty
       updateScore();
       updateWell();
       timerDisplay.textContent = `${timer}s`;
       gameTimer = setInterval(updateTimer, 1000);
-      dropInterval = setInterval(createDrop, 700);
+      dropInterval = setInterval(createDrop, dropIntervalTime);
     }
 
     function endGame() {
@@ -432,9 +501,20 @@
       clearInterval(gameTimer);
       endScreen.style.display = 'block';
       resetButton.style.display = 'none';
-      endMessage.textContent = score >= winScore ? "You built the well!" : "Try again to build the well!";
+      endMessage.textContent = score >= winScore ? "You built the well! 💧" : "Try again to build the well!";
+      // Show restart button only if player wins
       if (score >= winScore) {
+        restartButton.style.display = 'inline-block';
+        // Show a clean water fact
+        endFact.style.display = 'block';
+        endFact.textContent = "Did you know? Every $40 raised can give one person clean water for life.";
         showConfetti();
+        soundWin.currentTime = 0; soundWin.play();
+      } else {
+        restartButton.style.display = 'none';
+        endFact.style.display = 'none';
+        // Play a "bad" sound if lost
+        soundBad.currentTime = 0; soundBad.play();
       }
     }
 
@@ -454,21 +534,30 @@
     function updateScore() {
       scoreDisplay.textContent = `Score: ${score}`;
       updateWell();
+      // Show milestone messages if score matches
+      milestoneMessages.forEach(milestone => {
+        const milestoneScore = typeof milestone.score === "function" ? milestone.score() : milestone.score;
+        if (score === milestoneScore && !shownMilestones[milestoneScore]) {
+          feedback.textContent = milestone.message;
+          feedback.style.color = '#ffe600';
+          shownMilestones[milestoneScore] = true;
+        }
+      });
     }
 
     function updateWell() {
-  const percent = Math.min(100, (score / winScore) * 100);
-  fillBar.style.height = percent + '%';
+      const percent = Math.min(100, (score / winScore) * 100);
+      fillBar.style.height = percent + '%';
 
-  const wall = document.getElementById('brick-wall');
-  wall.innerHTML = '';
-  const brickCount = Math.floor(score / 3);
-  for (let i = 0; i < brickCount; i++) {
-    const brick = document.createElement('div');
-    brick.classList.add('brick');
-    wall.appendChild(brick);
-  }
-}
+      const wall = document.getElementById('brick-wall');
+      wall.innerHTML = '';
+      const brickCount = Math.floor(score / 3);
+      for (let i = 0; i < brickCount; i++) {
+        const brick = document.createElement('div');
+        brick.classList.add('brick');
+        wall.appendChild(brick);
+      }
+    }
 
     function createDrop() {
       const drop = document.createElement('div');
@@ -508,10 +597,34 @@
         }
 
         if (y > 600) {
+          // Missed drop
           drop.remove();
           clearInterval(fall);
+          soundBad.currentTime = 0; soundBad.play();
         }
       }, 30);
+
+      // Allow player to click/tap drops to remove them (simulate "collecting" or "removing" obstacles)
+      drop.addEventListener('click', function handleDropClick() {
+        if (!drop.parentNode) return;
+        if (polluted) {
+          feedback.textContent = "Good! Removed pollution!";
+          feedback.style.color = 'orange';
+          soundBad.currentTime = 0; soundBad.play();
+        } else {
+          score++;
+          feedback.textContent = "Bonus! Quick catch!";
+          feedback.style.color = 'green';
+          soundGood.currentTime = 0; soundGood.play();
+          updateScore();
+        }
+        drop.remove();
+        clearInterval(fall);
+      });
+      drop.addEventListener('touchstart', function handleDropTouch(e) {
+        e.preventDefault();
+        drop.click();
+      }, { passive: false });
     }
 
     // Move well with arrow keys
@@ -556,6 +669,16 @@
     document.getElementById('game-container').addEventListener('touchend', function() {
       touchStartX = null;
     });
+
+    // Disable changing difficulty during a game
+    difficultySelect.onchange = function() {
+      if (dropInterval || gameTimer) {
+        alert("You can't change difficulty during a game. Please reset or finish the game first.");
+        difficultySelect.value = Object.keys(difficultySettings).find(
+          k => difficultySettings[k].winScore === winScore && difficultySettings[k].timer === timer && difficultySettings[k].dropInterval === dropIntervalTime
+        ) || "normal";
+      }
+    };
 
     startButton.onclick = startGame;
     restartButton.onclick = startGame;
